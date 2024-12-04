@@ -26,5 +26,5 @@ public class CreateAuctionDto
     public int ReservePrice { get; set; }
 
     [Required]
-    public DateTime AuctioEnd { get; set; }
+    public DateTime AuctionEnd { get; set; }
 }
