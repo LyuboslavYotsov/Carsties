@@ -1,3 +1,4 @@
+using BiddingService.Consumers;
 using MassTransit;
 using MongoDB.Driver;
 using MongoDB.Entities;
@@ -23,6 +24,8 @@ builder.Services.AddMassTransit(x =>
     });
 
     x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("bids", false));
+
+    x.AddConsumersFromNamespaceContaining<AuctionCreatedConsumer>();
 });
 
 builder.Services.AddAuthentication(Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme)
