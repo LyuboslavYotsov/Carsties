@@ -1,4 +1,4 @@
-import { getDetailedViewData } from '@/app/actions/auctionActions'
+import { getBidsForAuction, getDetailedViewData } from '@/app/actions/auctionActions'
 import Heading from '@/app/components/Heading';
 import React from 'react'
 import CountdownTimer from '../../CountdownTimer';
@@ -12,6 +12,7 @@ export default async function Details({ params }: { params: Promise<{ id: string
 
   const data = await getDetailedViewData((await (params)).id);
   const user = await getCurrentUser();
+  const bids = await getBidsForAuction((await (params)).id);
 
   return (
     <div>
@@ -38,6 +39,9 @@ export default async function Details({ params }: { params: Promise<{ id: string
 
         <div className='border-2 rounded-lg p-2 bg-gray-100'>
           <Heading title='Bids' />
+          {bids.map(bid => (
+            <p key={bid.id}>{bid.bidder} - {bid.amount}</p>
+          ))}
         </div>
       </div>
 
