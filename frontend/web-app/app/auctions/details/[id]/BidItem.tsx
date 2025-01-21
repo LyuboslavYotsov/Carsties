@@ -14,19 +14,19 @@ export default function BidItem({bid}: Props) {
         let text = '';
         switch (bid.bidStatus) {
             case 'Accepted':
-                bgColor = 'bg-green-200'
+                bgColor = 'bg-green-500'
                 text = 'Bid accepted'
                 break;
-            case 'AcceptedBellowReserve':
-                bgColor = 'bg-amer-500'
+            case 'AcceptedBelowReserve':
+                bgColor = 'bg-amber-500'
                 text = 'Reserve not met'
                 break;
             case 'TooLow':
-                bgColor = 'bg-red-200'
+                bgColor = 'bg-red-500'
                 text = 'Bid was too low'
                 break;
             default:
-                bgColor = 'bg-red-200'
+                bgColor = 'bg-red-500'
                 text = 'Bid placed after auction finished'
                 break;
         }
