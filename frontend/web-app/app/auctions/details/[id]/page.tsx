@@ -8,12 +8,12 @@ import { getCurrentUser } from '@/app/actions/authActions';
 import EditButton from './EditButton';
 import DeleteButton from './DeleteButton';
 import BidItem from './BidItem';
+import BidList from './BidList';
 
 export default async function Details({ params }: { params: Promise<{ id: string }> }) {
 
   const data = await getDetailedViewData((await (params)).id);
   const user = await getCurrentUser();
-  const bids = await getBidsForAuction((await (params)).id);
 
   return (
     <div>
@@ -38,12 +38,8 @@ export default async function Details({ params }: { params: Promise<{ id: string
           <CardImage imageUrl={data.imageUrl} />
         </div>
 
-        <div className='border-2 rounded-lg p-2 bg-gray-100'>
-          <Heading title='Bids' />
-          {bids.map(bid => (
-            <BidItem key={bid.id} bid={bid} />
-          ))}
-        </div>
+        <BidList user={user} auction={data} />
+
       </div>
 
       <div className='mt-3 grid grid-cols-1 rounded-lg'>
