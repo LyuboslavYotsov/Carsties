@@ -2,21 +2,45 @@
 
 import { useAuctionStore } from '@/hooks/useAuctionStore'
 import { useBidStore } from '@/hooks/useBidStore'
-import { Bid } from '@/types'
-import { HttpTransportType, HubConnection, HubConnectionBuilder } from '@microsoft/signalr'
+import { Auction, AuctionFinished, Bid } from '@/types'
+import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr'
+import { User } from 'next-auth'
 import { useParams } from 'next/navigation'
 import { ReactNode, useCallback, useEffect, useRef } from 'react'
+import AuctionCreatedToast from '../components/AuctionCreatedToast'
+import toast from 'react-hot-toast'
+import { getDetailedViewData } from '../actions/auctionActions'
+import AuctionFinishedToast from '../components/AuctionFinishedToast'
 
 type Props = {
     children: ReactNode;
+    user: User | null;
 }
 
-export default function SignalRProvider({ children }: Props) {
+export default function SignalRProvider({ children, user }: Props) {
 
     const connection = useRef<HubConnection | null>(null);
     const setCurrentPrice = useAuctionStore(state => state.setCurrentPrice);
     const addBid = useBidStore(state => state.addBid);
     const params = useParams<{id: string}>();
+
+    const handleAuctionFinished = useCallback((finishedAuction: AuctionFinished) => {
+        const auction = getDetailedViewData(finishedAuction.auctionId);
+
+        return toast.promise(auction, {
+            loading: 'Loading',
+            success: (auction: Auction) => <AuctionFinishedToast auction={auction} finishedAuction={finishedAuction} />,
+            error: (err: Error) => 'Auction finished'
+        }, {success: {duration: 10000, icon: null}})
+    }, [])
+
+    const handleAuctionCreated = useCallback((auction: Auction) => {
+        if (user?.username !== auction.seller) {
+            return toast(<AuctionCreatedToast auction={auction}/>, {
+                duration: 10000
+            })
+        }
+    }, [user?.username])
 
     const handleBidPlaced = useCallback((bid: Bid) => {
         if (bid.bidStatus.includes('Accepted')) {
@@ -41,12 +65,16 @@ export default function SignalRProvider({ children }: Props) {
         }
 
         connection.current.on('BidPlaced', handleBidPlaced);
+        connection.current.on('AuctionCreated', handleAuctionCreated);
+        connection.current.on('AuctionFinished', handleAuctionFinished);
 
         return () => {
             connection.current?.off('BidPlaced', handleBidPlaced);
+            connection.current?.off('AuctionCreated', handleAuctionCreated);
+            connection.current?.off('AuctionFinished', handleAuctionFinished);
         }
 
-    },[setCurrentPrice, handleBidPlaced])
+    },[setCurrentPrice, handleBidPlaced, handleAuctionCreated, handleAuctionFinished])
 
     return (
         children
