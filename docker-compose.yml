@@ -121,6 +121,23 @@ services:
     depends_on:
       - rabbitmq
 
+  web-app:
+    image: helixs66/web-app:lates
+    build:
+      context: .
+      dockerfile: frontend/web-app/Dockerfile
+    volumes:
+      - /var/lib/web/data
+    ports:
+      - 3000:3000
+    environment:
+      - AUTH_SECRET="FYL8hzR84pwLlzCOLzsd2azjlGE30vwgph6+TG9W2dc="
+      - AUTH_URL=http://localhost:3000
+      - AUTH_URL_INTERNAL=http://web-app:3000
+      - API_URL=http://gateway-svc/
+      - ID_URL=http://localhost:5000
+      - NOTIFY_URL=http://localhost:6001/notifications
+
 volumes:
   pgdata:
   mongodata:

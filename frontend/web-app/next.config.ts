@@ -5,7 +5,14 @@ const nextConfig: NextConfig = {
     fetches: {
        fullUrl: true
     }
+  }
+};
+
+module.exports = {
+  typescript: {
+    ignoreBuildErrors: true,
   },
+  output: 'standalone',
   images: {
     remotePatterns: [
       {protocol: 'https', hostname: 'cdn.pixabay.com'}
